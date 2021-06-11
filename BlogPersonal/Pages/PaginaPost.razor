@@ -1,0 +1,21 @@
+﻿@page "/PostPa/{PostId:int}"
+
+@if (post != null)
+{
+
+    <h1>@post.Titulo</h1>
+    <h4>@post.Fecha.ToString("dddd d MMMM yyyy")</h4>
+    <p>@post.Contenido</p>
+}
+@code {
+
+    [Parameter]
+    public int PostId { get; set; }
+    private Post post;
+
+    protected override void OnInitialized()
+    {
+        post = PostBLL.Buscar(PostId);
+    }
+
+}

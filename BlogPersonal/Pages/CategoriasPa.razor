@@ -1,0 +1,32 @@
+﻿
+@page "/CategoriaPa/{CategoriaId:int}"
+
+@if (categoria != null)
+{
+    <h1>@categoria.Nombre</h1>
+}
+@if (Posts != null)
+{
+    @foreach (var post in Posts)
+    {
+        <div>
+            <h3><a href="/PostPa/@post.PostId">@post.Titulo</a></h3>
+            <p>@post.Fecha.ToString("dddd d MMMM yyyy")</p>
+            <p>@post.Resumen</p>
+        </div>
+    }
+}
+
+@code {
+    [Parameter]
+    public int CategoriaId { get; set; }
+    private Categoriaas categoria;
+    public IEnumerable<Post> Posts { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        categoria = CategoriasBLL.Buscar(CategoriaId);
+
+        Posts = PostBLL.GetList(p => p.Categoria.Contains(Convert.ToString(categoria.CategoriaId)));
+    }
+}

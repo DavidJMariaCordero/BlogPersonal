@@ -1,0 +1,160 @@
+﻿@page "/Post"
+@inject IToastService toastService
+<EditForm Model="post" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="card-header">
+        <h2>Registro de Post</h2>
+    </div>
+
+    <div class="card-body">
+        <form>
+
+            <div class="form-group">
+                <label>Post</label>
+                <div class="input-group">
+                    <InputSelect class="form-control" @bind-Value="post.PostId">
+                        @foreach (var post in ListaPost)
+                        {
+                            <option value="@post.PostId">@post.Titulo  @post.Fecha</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => post.PostId)" />
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-warning" @onclick="Buscar">
+                            <i class="oi oi-magnifying-glass mr-1" />Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Titulo</label>
+                <div class="input-group">
+                    <InputText @bind-Value="post.Titulo" class="form-control " />
+                </div>
+                <div><ValidationMessage For="@(() => post.Titulo)" /></div>
+            </div>
+
+            <div class="form-group">
+                <label>Contenido</label>
+                <div class="input-group">
+                    <InputTextArea @bind-Value="post.Contenido" class="form-control " />
+                </div>
+                <div><ValidationMessage For="@(() => post.Contenido)" /></div>
+            </div>
+
+            <div class="form-group">
+                <label>Fecha</label>
+                <div class="input-group">
+                    <InputDate @bind-Value="post.Fecha" class="form-control" />
+                    <ValidationMessage For="@(() => post.Fecha)" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Categor&iacute;a</label>
+                <div class="input-group">
+                    <InputSelect class="form-control" @bind-Value="post.Categoria">
+                        @foreach (var categoria in ListaCategorias)
+                        {
+                            <option value="@categoria.CategoriaId">@categoria.Nombre</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div><ValidationMessage For="@(() => post.Categoria)" /></div>
+            </div>
+
+            <div class="form-group">
+                <label>Resumen</label>
+                <div class="input-group">
+                    <InputTextArea @bind-Value="post.Resumen" class="form-control" />
+                    <ValidationMessage For="@(() => post.Resumen)" />
+                </div>
+            </div>
+
+        </form>
+
+        <div class="card-footer">
+            <div class="form-group text-center" display: inline-block>
+
+                <button type="button" class="btn btn-lg btn-primary" @onclick="Limpiar">
+                    <i class="oi oi-file mr-1" />Nuevo
+                </button>
+
+                <button type="submit" class="btn btn-lg btn-success">
+                    <i class="oi oi-account-login mr-1" style="transform:rotate(90deg)" />Guardar
+                </button>
+
+                <button type="button" class="btn btn-lg btn-danger" @onclick="Eliminar">
+                    <i class="oi oi-trash mr-1" />Eliminar
+                </button>
+
+            </div>
+        </div>
+
+    </div>
+</EditForm>
+
+@code {
+
+    private Post post = new Post();
+    private List<Post> ListaPost { get; set; }
+    private List<Categoriaas> ListaCategorias { get; set; }
+
+    protected override void OnInitialized()
+    {
+        ListaCategorias = CategoriasBLL.GetList(c => true);
+        Limpiar();
+
+        Buscar();
+    }
+    private void Limpiar()
+    {
+        ListaPost = PostBLL.GetList(c => true);
+        post = new Post();
+    }
+    private void Buscar()
+    {
+        if (post.PostId > 0)
+        {
+            var encontrado = PostBLL.Buscar(post.PostId);
+
+            if (encontrado != null)
+                this.post = encontrado;
+            else
+                toastService.ShowWarning("No encontrado");
+        }
+    }
+
+    public void Guardar()
+    {
+        bool guardo;
+
+        guardo = PostBLL.Guardar(post);
+
+        if (guardo)
+        {
+            Limpiar();
+            toastService.ShowSuccess("Guardado correctamente");
+        }
+        else
+            toastService.ShowError("No fue posible guardar");
+    }
+
+    public void Eliminar()
+    {
+        bool elimino;
+
+        elimino = PostBLL.Eliminar(post.PostId);
+
+        if (elimino)
+        {
+            Limpiar();
+            toastService.ShowSuccess("Eliminado correctamente");
+        }
+        else
+            toastService.ShowError("No fue posible eliminar");
+    }
+
+}
+

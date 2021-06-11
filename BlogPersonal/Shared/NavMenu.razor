@@ -1,0 +1,31 @@
+﻿<div class="top-row pl-4 navbar navbar-dark">
+    <a class="navbar-brand" href="">BlogPersonal</a>
+    <button class="navbar-toggler" @onclick="ToggleNavMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <ul class="nav flex-column">
+        @foreach (var categoria in categoria)
+        {
+            <li class="nav-item px-3"><a href="/CategoriaPa/@categoria.CategoriaId" >@categoria.Nombre</a></li>
+        }
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="Post">
+                <span class="oi oi-person" aria-hidden="true"></span> Registro de posts
+            </NavLink>
+        </li>
+    </ul>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+    private List<Categoriaas> categoria = CategoriasBLL.GetList(c => true);
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu() {
+        collapseNavMenu = !collapseNavMenu;
+    }
+    
+}
